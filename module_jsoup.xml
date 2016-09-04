@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_jsoup" default="compile.module.jsoup">
+  <dirname property="module.jsoup.basedir" file="${ant.file.module_jsoup}"/>
+  
+  <property name="module.jdk.home.jsoup" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.jsoup" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.jsoup" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.jsoup" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="jsoup.output.dir" value="${module.jsoup.basedir}/out/production/Jsoup"/>
+  <property name="jsoup.testoutput.dir" value="${module.jsoup.basedir}/out/test/Jsoup"/>
+  
+  <path id="jsoup.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="jsoup.module.production.classpath">
+    <path refid="${module.jdk.classpath.jsoup}"/>
+    <path refid="library.jsoup-1.9.2.classpath"/>
+  </path>
+  
+  <path id="jsoup.runtime.production.module.classpath">
+    <pathelement location="${jsoup.output.dir}"/>
+    <path refid="library.jsoup-1.9.2.classpath"/>
+  </path>
+  
+  <path id="jsoup.module.classpath">
+    <path refid="${module.jdk.classpath.jsoup}"/>
+    <pathelement location="${jsoup.output.dir}"/>
+    <path refid="library.jsoup-1.9.2.classpath"/>
+  </path>
+  
+  <path id="jsoup.runtime.module.classpath">
+    <pathelement location="${jsoup.testoutput.dir}"/>
+    <pathelement location="${jsoup.output.dir}"/>
+    <path refid="library.jsoup-1.9.2.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.jsoup">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.jsoup">
+    <patternset refid="excluded.from.module.jsoup"/>
+  </patternset>
+  
+  <path id="jsoup.module.sourcepath">
+    <dirset dir="${module.jsoup.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.jsoup" depends="compile.module.jsoup.production,compile.module.jsoup.tests" description="Compile module Jsoup"/>
+  
+  <target name="compile.module.jsoup.production" depends="register.custom.compilers" description="Compile module Jsoup; production classes">
+    <mkdir dir="${jsoup.output.dir}"/>
+    <javac2 destdir="${jsoup.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.jsoup}/javac">
+      <compilerarg line="${compiler.args.jsoup}"/>
+      <bootclasspath refid="jsoup.module.bootclasspath"/>
+      <classpath refid="jsoup.module.production.classpath"/>
+      <src refid="jsoup.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.jsoup"/>
+    </javac2>
+    
+    <copy todir="${jsoup.output.dir}">
+      <fileset dir="${module.jsoup.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.jsoup.tests" depends="register.custom.compilers,compile.module.jsoup.production" description="compile module Jsoup; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.jsoup" description="cleanup module">
+    <delete dir="${jsoup.output.dir}"/>
+    <delete dir="${jsoup.testoutput.dir}"/>
+  </target>
+</project>
